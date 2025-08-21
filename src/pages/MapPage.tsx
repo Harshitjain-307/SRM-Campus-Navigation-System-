@@ -96,6 +96,32 @@ const locations: Location[] = [
   }
 ]
 
+// Real-world lat/lng for Street View embedding
+const LOCATION_LATLNG: Record<string, [number, number]> = {
+  'campus-gate': [28.797629, 77.53698],
+  'admin-block': [28.796568, 77.538177],
+  'stationary': [28.796775, 77.538381],
+  'red-canteen': [28.796051, 77.53915],
+  'h-block-hostel': [28.795657, 77.539948],
+  'g-block': [28.796079, 77.540866],
+}
+
+function getStreetViewEmbedUrl(lat: number, lng: number): string {
+  // Uses Google Maps Street View embed without requiring an API key
+  // If a panorama exists nearby, it will render; otherwise Google shows a fallback
+  const base = 'https://maps.google.com/maps'
+  const params = new URLSearchParams({
+    q: '',
+    layer: 'c',
+    cbll: `${lat},${lng}`,
+    cbp: '11,0,0,0,0',
+    lci: 'com.google.streetview',
+    source: 'embed',
+    output: 'svembed',
+  })
+  return `${base}?${params.toString()}`
+}
+
 export default function MapPage() {
   const [query, setQuery] = useState('')
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
@@ -392,24 +418,29 @@ export default function MapPage() {
                 {/* Street View Content */}
                 <div className="p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Street View Simulation */}
+                    {/* Street View Embed */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                         <span className="w-2 h-2 bg-brand-500 rounded-full"></span>
                         Street View
                       </h3>
-                      <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl border border-white/20 p-6 h-64 flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-16 h-16 bg-brand-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-                            <span className="text-2xl">🏛️</span>
+                      <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl border border-white/20 p-0 h-64 overflow-hidden">
+                        {LOCATION_LATLNG[selectedLocation.id] ? (
+                          <iframe
+                            title={`${selectedLocation.name} Street View`}
+                            src={getStreetViewEmbedUrl(
+                              LOCATION_LATLNG[selectedLocation.id][0],
+                              LOCATION_LATLNG[selectedLocation.id][1]
+                            )}
+                            className="w-full h-full"
+                            allowFullScreen
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+                            Street view is not available for this location.
                           </div>
-                          <p className="text-slate-400 text-sm">
-                            {selectedLocation.name} - Street View
-                          </p>
-                          <p className="text-slate-500 text-xs mt-1">
-                            Interactive 3D street navigation
-                          </p>
-                        </div>
+                        )}
                       </div>
                     </div>
 
@@ -481,59 +512,6 @@ export default function MapPage() {
         </AnimatePresence>
       </div>
     </div>
-  )
-}
-
-function LeafletMap({ selected, showPath }: { selected: CampusPlace | null; showPath: boolean }) {
-  const defaultCenter: LatLngExpression = [28.796568, 77.538177]
-  const mapRef = useRef<L.Map | null>(null)
-
-  const markerIcon = useMemo(
-    () =>
-      L.divIcon({
-        className: 'custom-marker',
-        html: '<div style="background-color: #60a5fa; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
-      }),
-    []
-  )
-
-  const Path = () => {
-    const map = useMap()
-    useEffect(() => {
-      if (selected) {
-        map.flyTo(selected.coords as LatLngExpression, 18, { duration: 1 })
-      }
-    }, [selected, map])
-
-    if (!selected || !showPath) return null
-    const start: LatLngExpression = defaultCenter
-    const end: LatLngExpression = selected.coords
-    return <Polyline positions={[start, end]} pathOptions={{ color: '#60a5fa', weight: 4, opacity: 0.8 }} />
-  }
-
-  return (
-    <MapContainer
-      center={defaultCenter}
-      zoom={17}
-      scrollWheelZoom
-      style={{ height: '100%', width: '100%' }}
-      whenCreated={(m) => (mapRef.current = m)}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-
-      {CAMPUS_PLACES.map((p) => (
-        <Marker key={p.key} position={p.coords} icon={markerIcon}>
-          <Popup>{p.name}</Popup>
-        </Marker>
-      ))}
-
-      <Path />
-    </MapContainer>
   )
 }
 
