@@ -96,7 +96,7 @@ const locations: Location[] = [
   }
 ]
 
-// Real-world lat/lng for Street View embedding
+// Real-world lat/lng per location
 const LOCATION_LATLNG: Record<string, [number, number]> = {
   'campus-gate': [28.797629, 77.53698],
   'admin-block': [28.796568, 77.538177],
@@ -106,9 +106,17 @@ const LOCATION_LATLNG: Record<string, [number, number]> = {
   'g-block': [28.796079, 77.540866],
 }
 
+// Whether Google has decent Street View coverage nearby (fallback to Map if false)
+const HAS_STREET_VIEW: Record<string, boolean> = {
+  'campus-gate': true,
+  'admin-block': true,
+  'stationary': false,
+  'red-canteen': false,
+  'h-block-hostel': false,
+  'g-block': false,
+}
+
 function getStreetViewEmbedUrl(lat: number, lng: number): string {
-  // Uses Google Maps Street View embed without requiring an API key
-  // If a panorama exists nearby, it will render; otherwise Google shows a fallback
   const base = 'https://maps.google.com/maps'
   const params = new URLSearchParams({
     q: '',
@@ -122,29 +130,38 @@ function getStreetViewEmbedUrl(lat: number, lng: number): string {
   return `${base}?${params.toString()}`
 }
 
+function getMapEmbedUrl(lat: number, lng: number, zoom = 17): string {
+  // Simple Google Maps embed (no API key): centers map at lat,lng
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`;
+}
+
 export default function MapPage() {
   const [query, setQuery] = useState('')
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null)
   const [showStreetView, setShowStreetView] = useState(false)
   const [searchResults, setSearchResults] = useState<Location[]>([])
+  const [viewMode, setViewMode] = useState<'street' | 'map'>('map')
 
   const handleSearch = () => {
     if (!query.trim()) return
-    
-    const results = locations.filter(location =>
+
+    const results = locations.filter((location) =>
       location.name.toLowerCase().includes(query.toLowerCase()) ||
       location.description.toLowerCase().includes(query.toLowerCase())
     )
     setSearchResults(results)
-    
+
     if (results.length > 0) {
-      setSelectedLocation(results[0])
+      const loc = results[0]
+      setSelectedLocation(loc)
+      setViewMode(HAS_STREET_VIEW[loc.id] ? 'street' : 'map')
       setShowStreetView(true)
     }
   }
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location)
+    setViewMode(HAS_STREET_VIEW[location.id] ? 'street' : 'map')
     setShowStreetView(true)
     setQuery(location.name)
   }
@@ -155,7 +172,7 @@ export default function MapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="mx-auto max-w-7xl px-4 py-6">
         <motion.div
           className="mb-8 text-center"
@@ -184,7 +201,7 @@ export default function MapPage() {
                 <span className="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
                 Search Location
               </h2>
-              
+
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <input
@@ -259,131 +276,83 @@ export default function MapPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl border border-white/10 overflow-hidden h-[600px]">
-              {/* Map Background with 3D Effect */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900">
-                {/* Grid Pattern */}
-                <div className="absolute inset-0 opacity-20">
-                  <div className="w-full h-full" style={{
-                    backgroundImage: `
-                      linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-                    `,
-                    backgroundSize: '40px 40px'
-                  }}></div>
-                </div>
-
-                {/* Campus Buildings */}
-                {locations.map((location) => (
-                  <motion.div
-                    key={location.id}
-                    className={`absolute w-16 h-16 cursor-pointer transition-all duration-300 ${
-                      selectedLocation?.id === location.id 
-                        ? 'z-20 scale-110' 
-                        : 'z-10 hover:scale-105'
-                    }`}
-                    style={{
-                      left: `${location.coordinates.x}%`,
-                      top: `${location.coordinates.y}%`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                    onClick={() => handleLocationSelect(location)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {/* Building Shape */}
-                    <div className={`w-full h-full rounded-lg shadow-2xl transition-all duration-300 ${
-                      location.type === 'building' 
-                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-2 border-blue-400/50' 
-                        : location.type === 'facility'
-                        ? 'bg-gradient-to-br from-green-500 to-green-600 border-2 border-green-400/50'
-                        : 'bg-gradient-to-br from-purple-500 to-purple-600 border-2 border-purple-400/50'
-                    }`}>
-                      {/* Building Details */}
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-white text-xs font-bold text-center">
-                          {location.name.split(' ').map(word => word[0]).join('')}
-                        </div>
-                      </div>
-                      
-                      {/* 3D Effect */}
-                      <div className="absolute -bottom-1 left-1 right-1 h-1 bg-black/30 rounded-b-lg"></div>
-                    </div>
-
-                    {/* Location Label */}
-                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-                      <div className="bg-slate-800/90 backdrop-blur-sm px-2 py-1 rounded-md border border-white/20">
-                        <p className="text-xs text-white font-medium">{location.name}</p>
-                      </div>
-                    </div>
-
-                    {/* Connection Lines */}
-                    {selectedLocation && selectedLocation.id === location.id && (
-                      <motion.div
-                        className="absolute inset-0"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        <div className="absolute inset-0 border-2 border-brand-400 rounded-lg animate-pulse"></div>
-                      </motion.div>
-                    )}
-                  </motion.div>
-                ))}
-
-                {/* Paths/Roads */}
-                <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 5 }}>
-                  <defs>
-                    <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" />
-                      <stop offset="50%" stopColor="#60a5fa" stopOpacity="0.6" />
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.3" />
-                    </linearGradient>
-                  </defs>
-                  
-                  {/* Main Campus Path */}
-                  <path
-                    d="M 20% 20% Q 40% 30% 60% 45% T 80% 25%"
-                    stroke="url(#pathGradient)"
-                    strokeWidth="3"
-                    fill="none"
-                    strokeDasharray="5,5"
-                    className="animate-pulse"
-                  />
-                  
-                  {/* Secondary Paths */}
-                  <path
-                    d="M 35% 70% Q 50% 60% 60% 45%"
-                    stroke="url(#pathGradient)"
-                    strokeWidth="2"
-                    fill="none"
-                    strokeDasharray="3,3"
-                    opacity="0.6"
-                  />
-                </svg>
+            <div className="relative rounded-2xl border border-white/10 overflow-hidden h-[600px] bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.12),transparent_25%),radial-gradient(circle_at_70%_80%,rgba(16,185,129,0.12),transparent_25%),linear-gradient(to_br,#0f172a,#0b1220)]">
+              {/* Subtle grid */}
+              <div className="absolute inset-0 opacity-30">
+                <div className="w-full h-full" style={{
+                  backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)`,
+                  backgroundSize: '40px 40px'
+                }} />
               </div>
 
-              {/* Map Controls */}
+              {/* Campus Buildings */}
+              {locations.map((location) => (
+                <motion.div
+                  key={location.id}
+                  className={`absolute w-20 h-24 cursor-pointer transition-all duration-300 ${
+                    selectedLocation?.id === location.id ? 'z-20 scale-110' : 'z-10 hover:scale-105'
+                  }`}
+                  style={{
+                    left: `${location.coordinates.x}%`,
+                    top: `${location.coordinates.y}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  onClick={() => handleLocationSelect(location)}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {/* Building card */}
+                  <div className={`relative w-full h-full rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.35)] ring-1 ring-white/10 transition-all ${
+                    location.type === 'building'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                      : location.type === 'facility'
+                      ? 'bg-gradient-to-br from-green-500 to-green-600'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-600'
+                  }`}>
+                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-bold text-white/90">
+                      {location.name.split(' ').map((w) => w[0]).join('')}
+                    </div>
+                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2">
+                      <div className="bg-slate-900/90 backdrop-blur px-2 py-1 rounded-md border border-white/10 shadow">
+                        <p className="text-xs text-white font-medium text-center w-max max-w-[120px] truncate">{location.name}</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Path overlays */}
+              <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 5 }}>
+                <defs>
+                  <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.25" />
+                    <stop offset="50%" stopColor="#22c55e" stopOpacity="0.55" />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.25" />
+                  </linearGradient>
+                </defs>
+                <path d="M 20% 20% Q 40% 30% 60% 45% T 80% 25%" stroke="url(#pathGradient)" strokeWidth="3" fill="none" strokeDasharray="6,6" />
+                <path d="M 35% 70% Q 50% 60% 60% 45%" stroke="url(#pathGradient)" strokeWidth="2" fill="none" strokeDasharray="4,4" opacity="0.7" />
+              </svg>
+
+              {/* Zoom controls */}
               <div className="absolute top-4 right-4 flex flex-col gap-2">
-                <button className="w-10 h-10 bg-slate-800/80 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-slate-700/80 transition-all flex items-center justify-center">
+                <button className="w-10 h-10 bg-slate-800/80 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-slate-700/80 transition-all flex items-center justify-center shadow">
                   <span className="text-lg font-bold">+</span>
                 </button>
-                <button className="w-10 h-10 bg-slate-800/80 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-slate-700/80 transition-all flex items-center justify-center">
+                <button className="w-10 h-10 bg-slate-800/80 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-slate-700/80 transition-all flex items-center justify-center shadow">
                   <span className="text-lg font-bold">−</span>
                 </button>
               </div>
 
-              {/* Map Attribution */}
-              <div className="absolute bottom-4 left-4 bg-slate-800/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/20">
-                <p className="text-xs text-slate-400">
-                  SRM University Campus Map • Interactive 3D View
-                </p>
+              {/* Attribution */}
+              <div className="absolute bottom-4 left-4 bg-slate-800/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/20 shadow">
+                <p className="text-xs text-slate-300">SRM University Campus Map • Interactive 3D View</p>
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Street View Modal */}
+        {/* Street/Map Modal */}
         <AnimatePresence>
           {showStreetView && selectedLocation && (
             <motion.div
@@ -393,13 +362,13 @@ export default function MapPage() {
               exit={{ opacity: 0 }}
             >
               <motion.div
-                className="bg-slate-800 rounded-2xl border border-white/20 max-w-4xl w-full max-h-[90vh] overflow-hidden"
+                className="bg-slate-800 rounded-2xl border border-white/20 max-w-5xl w-full max-h-[90vh] overflow-hidden"
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               >
-                {/* Street View Header */}
+                {/* Header */}
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-6 border-b border-white/10">
                   <div className="flex items-center justify-between">
                     <div>
@@ -415,36 +384,69 @@ export default function MapPage() {
                   </div>
                 </div>
 
-                {/* Street View Content */}
+                {/* Content */}
                 <div className="p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Street View Embed */}
+                    {/* Map viewer with toggle */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                        <span className="w-2 h-2 bg-brand-500 rounded-full"></span>
-                        Street View
-                      </h3>
-                      <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl border border-white/20 p-0 h-64 overflow-hidden">
-                        {LOCATION_LATLNG[selectedLocation.id] ? (
-                          <iframe
-                            title={`${selectedLocation.name} Street View`}
-                            src={getStreetViewEmbedUrl(
-                              LOCATION_LATLNG[selectedLocation.id][0],
-                              LOCATION_LATLNG[selectedLocation.id][1]
-                            )}
-                            className="w-full h-full"
-                            allowFullScreen
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-                            Street view is not available for this location.
-                          </div>
-                        )}
+                      <div className="flex items-center gap-2 mb-1">
+                        <button
+                          onClick={() => setViewMode('street')}
+                          disabled={!HAS_STREET_VIEW[selectedLocation.id]}
+                          className={`px-3 py-1.5 rounded-md text-sm border transition ${
+                            viewMode === 'street' ? 'bg-brand-600 text-white border-brand-500' : 'bg-slate-700 text-slate-200 border-white/10 hover:bg-slate-600'
+                          } ${!HAS_STREET_VIEW[selectedLocation.id] ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          Street View
+                        </button>
+                        <button
+                          onClick={() => setViewMode('map')}
+                          className={`px-3 py-1.5 rounded-md text-sm border transition ${
+                            viewMode === 'map' ? 'bg-brand-600 text-white border-brand-500' : 'bg-slate-700 text-slate-200 border-white/10 hover:bg-slate-600'
+                          }`}
+                        >
+                          Map
+                        </button>
+                      </div>
+                      <div className="bg-slate-900/70 rounded-xl border border-white/10 p-0 h-64 overflow-hidden">
+                        {(() => {
+                          const coords = LOCATION_LATLNG[selectedLocation.id]
+                          if (!coords) {
+                            return (
+                              <div className="h-full flex items-center justify-center text-slate-400 text-sm">Location coordinates not available.</div>
+                            )
+                          }
+                          const [lat, lng] = coords
+                          if (viewMode === 'street') {
+                            if (!HAS_STREET_VIEW[selectedLocation.id]) {
+                              return (
+                                <div className="h-full flex items-center justify-center text-slate-400 text-sm">Street View not available here. Switch to Map.</div>
+                              )
+                            }
+                            return (
+                              <iframe
+                                title={`${selectedLocation.name} Street View`}
+                                src={getStreetViewEmbedUrl(lat, lng)}
+                                className="w-full h-full"
+                                allowFullScreen
+                                loading="lazy"
+                              />
+                            )
+                          }
+                          // Map mode
+                          return (
+                            <iframe
+                              title={`${selectedLocation.name} Map`}
+                              src={getMapEmbedUrl(lat, lng, 17)}
+                              className="w-full h-full"
+                              loading="lazy"
+                            />
+                          )
+                        })()}
                       </div>
                     </div>
 
-                    {/* Location Details */}
+                    {/* Details */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -496,7 +498,7 @@ export default function MapPage() {
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Actions */}
                   <div className="flex gap-3 mt-6 pt-6 border-t border-white/10">
                     <button className="flex-1 bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95">
                       Get Directions
