@@ -100,14 +100,14 @@ export default function MapPage() {
                 Search Location
               </h2>
               <div className="space-y-4">
-                <div className="flex gap-2 items-stretch">
+                <div className="flex gap-2 items-stretch w-full">
                   <input
                     type="text"
                     placeholder="Try 'Admin Block' or 'Red Canteen'"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-                    className="flex-1 bg-slate-700/50 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-transparent transition-all"
+                    className="flex-1 min-w-0 bg-slate-700/50 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-transparent transition-all"
                   />
                   <button
                     onClick={onSearch}
