@@ -100,7 +100,7 @@ export default function MapPage() {
                 Search Location
               </h2>
               <div className="space-y-4">
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-stretch">
                   <input
                     type="text"
                     placeholder="Try 'Admin Block' or 'Red Canteen'"
@@ -111,7 +111,7 @@ export default function MapPage() {
                   />
                   <button
                     onClick={onSearch}
-                    className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-500/25"
+                    className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white px-4 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-500/25 whitespace-nowrap flex-shrink-0"
                   >
                     Go
                   </button>
