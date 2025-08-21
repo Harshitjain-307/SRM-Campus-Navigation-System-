@@ -20,8 +20,8 @@ export default function LandingPage() {
       <FloatingParticles />
       
       {/* Hero content */}
-      <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 md:py-32">
-        <div className="grid items-center gap-16 md:grid-cols-2">
+      <div className="relative z-10 mx-auto max-w-6xl px-4 py-16 md:py-20">
+        <div className="grid items-center gap-8 md:grid-cols-2">
           {/* Left: Hero copy */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -34,7 +34,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <h1 className="text-balance text-5xl font-extrabold tracking-tight sm:text-7xl lg:text-8xl">
+              <h1 className="text-balance text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
                 <motion.span 
                   className="block bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent"
                   initial={{ opacity: 0, y: 20 }}
@@ -44,7 +44,7 @@ export default function LandingPage() {
                   Navigate Our
                 </motion.span>
                 <motion.span 
-                  className="mt-2 block bg-gradient-to-r from-brand-300 via-brand-500 to-cyan-300 bg-clip-text text-transparent"
+                  className="mt-1 block bg-gradient-to-r from-brand-300 via-brand-500 to-cyan-300 bg-clip-text text-transparent"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.6 }}
@@ -52,7 +52,7 @@ export default function LandingPage() {
                   Campus
                 </motion.span>
                 <motion.span 
-                  className="mt-2 block bg-gradient-to-r from-purple-400 via-pink-500 to-red-400 bg-clip-text text-transparent"
+                  className="mt-1 block bg-gradient-to-r from-purple-400 via-pink-500 to-red-400 bg-clip-text text-transparent"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.8 }}
@@ -64,7 +64,7 @@ export default function LandingPage() {
 
             {/* Description */}
             <motion.p
-              className="mt-8 max-w-xl text-xl text-slate-300 leading-relaxed"
+              className="mt-6 max-w-lg text-lg text-slate-300 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.0 }}
@@ -74,7 +74,7 @@ export default function LandingPage() {
 
             {/* Feature badges with staggered animation */}
             <motion.ul
-              className="mt-10 flex flex-wrap items-center gap-3 text-sm"
+              className="mt-8 flex flex-wrap items-center gap-2 text-sm"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.2 }}
@@ -91,7 +91,7 @@ export default function LandingPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 1.4 + index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-slate-200 backdrop-blur hover:border-brand-500/40 hover:bg-white/10 transition-all duration-300"
+                  className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-slate-200 backdrop-blur hover:border-brand-500/40 hover:bg-white/10 transition-all duration-300"
                 >
                   {feat}
                 </motion.li>
@@ -100,7 +100,7 @@ export default function LandingPage() {
 
             {/* CTAs with enhanced animations */}
             <motion.div
-              className="mt-12 flex flex-wrap items-center gap-6"
+              className="mt-10 flex flex-wrap items-center gap-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.6 }}
@@ -112,7 +112,7 @@ export default function LandingPage() {
               >
                 <Link
                   to="/map"
-                  className="relative inline-flex items-center rounded-xl bg-gradient-to-r from-brand-500 via-brand-600 to-indigo-600 px-8 py-4 text-lg font-semibold text-white shadow-2xl shadow-brand-500/25 transition-all duration-300 hover:shadow-brand-500/40"
+                  className="relative inline-flex items-center rounded-xl bg-gradient-to-r from-brand-500 via-brand-600 to-indigo-600 px-6 py-3 text-base font-semibold text-white shadow-2xl shadow-brand-500/25 transition-all duration-300 hover:shadow-brand-500/40"
                 >
                   <span className="relative z-10">Start Navigating</span>
                   <motion.div
@@ -132,7 +132,7 @@ export default function LandingPage() {
               >
                 <Link
                   to="/assistant"
-                  className="inline-flex items-center rounded-xl border border-white/20 bg-white/5 px-8 py-4 text-lg font-semibold text-slate-200 backdrop-blur transition-all duration-300 hover:border-brand-500/40 hover:bg-white/10 hover:text-white"
+                  className="inline-flex items-center rounded-xl border border-white/20 bg-white/5 px-6 py-3 text-base font-semibold text-slate-200 backdrop-blur transition-all duration-300 hover:border-brand-500/40 hover:bg-white/10 hover:text-white"
                 >
                   Ask the AI
                 </Link>
@@ -141,7 +141,7 @@ export default function LandingPage() {
 
             {/* Stats with staggered animation */}
             <motion.div
-              className="mt-16 grid w-full max-w-lg grid-cols-3 gap-6"
+              className="mt-12 grid w-full max-w-md grid-cols-3 gap-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.8 }}
@@ -157,17 +157,17 @@ export default function LandingPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 2.0 + index * 0.1 }}
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center backdrop-blur transition-all duration-300 hover:border-brand-500/30 hover:bg-white/10"
+                  className="rounded-xl border border-white/10 bg-white/5 p-4 text-center backdrop-blur transition-all duration-300 hover:border-brand-500/30 hover:bg-white/10"
                 >
                   <motion.p
-                    className="text-3xl font-bold text-white"
+                    className="text-2xl font-bold text-white"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.5, delay: 2.2 + index * 0.1, type: "spring" }}
                   >
                     {stat.number}
                   </motion.p>
-                  <p className="mt-2 text-sm text-slate-300">{stat.label}</p>
+                  <p className="mt-1 text-xs text-slate-300">{stat.label}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -175,22 +175,22 @@ export default function LandingPage() {
 
           {/* Right: Floating preview cards */}
           <motion.div
-            className="relative mx-auto w-full max-w-xl"
+            className="relative mx-auto w-full max-w-lg"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <motion.div
-              className="relative overflow-hidden rounded-3xl border border-white/20 bg-slate-900/40 p-6 backdrop-blur"
+              className="relative overflow-hidden rounded-2xl border border-white/20 bg-slate-900/40 p-5 backdrop-blur"
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
               {/* Background effects */}
-              <div className="pointer-events-none absolute -right-32 -top-32 h-64 w-64 rounded-full bg-gradient-to-tr from-brand-500/20 to-cyan-400/15 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-32 -left-32 h-64 w-64 rounded-full bg-gradient-to-tr from-purple-500/15 to-brand-400/10 blur-3xl" />
+              <div className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-gradient-to-tr from-brand-500/20 to-cyan-400/15 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-gradient-to-tr from-purple-500/15 to-brand-400/10 blur-3xl" />
 
               {/* Feature cards with staggered animation */}
-              <div className="grid gap-4">
+              <div className="grid gap-3">
                 {[
                   { icon: '🤖', title: 'AI Assistant', desc: 'Get instant directions and campus information with our intelligent chatbot.' },
                   { icon: '🗺️', title: 'Interactive Maps', desc: 'Explore campus with smooth pan, zoom, and custom location markers.' },
@@ -203,13 +203,13 @@ export default function LandingPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
                     whileHover={{ x: 5 }}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-4 transition-all duration-300 hover:border-brand-500/30 hover:bg-white/10"
+                    className="rounded-xl border border-white/10 bg-white/5 p-3 transition-all duration-300 hover:border-brand-500/30 hover:bg-white/10"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="text-2xl">{feature.icon}</span>
+                      <span className="text-xl">{feature.icon}</span>
                       <div>
-                        <h3 className="font-semibold text-white">{feature.title}</h3>
-                        <p className="mt-1 text-sm text-slate-300">{feature.desc}</p>
+                        <h3 className="font-semibold text-white text-sm">{feature.title}</h3>
+                        <p className="mt-1 text-xs text-slate-300">{feature.desc}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -228,7 +228,7 @@ function AnimatedBackground() {
     <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
       {/* Multiple moving gradient orbs */}
       <motion.div
-        className="absolute -top-40 left-1/4 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-brand-600/20 to-brand-400/15 blur-3xl"
+        className="absolute -top-32 left-1/4 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full bg-gradient-to-tr from-brand-600/20 to-brand-400/15 blur-3xl"
         animate={{ 
           rotate: 360,
           scale: [1, 1.1, 1],
@@ -239,7 +239,7 @@ function AnimatedBackground() {
         }}
       />
       <motion.div
-        className="absolute -bottom-40 right-1/4 h-[28rem] w-[28rem] rounded-full bg-gradient-to-tr from-cyan-500/15 to-brand-400/10 blur-3xl"
+        className="absolute -bottom-32 right-1/4 h-[20rem] w-[20rem] rounded-full bg-gradient-to-tr from-cyan-500/15 to-brand-400/10 blur-3xl"
         animate={{ 
           rotate: -360,
           scale: [1, 0.9, 1],
@@ -250,7 +250,7 @@ function AnimatedBackground() {
         }}
       />
       <motion.div
-        className="absolute top-1/2 left-1/2 h-[24rem] w-[24rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-purple-500/10 to-pink-500/10 blur-3xl"
+        className="absolute top-1/2 left-1/2 h-[18rem] w-[18rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-tr from-purple-500/10 to-pink-500/10 blur-3xl"
         animate={{ 
           rotate: 360,
           scale: [1, 1.2, 1],
@@ -273,7 +273,7 @@ function AnimatedBackground() {
 function FloatingParticles() {
   return (
     <div className="absolute inset-0 pointer-events-none">
-      {[...Array(20)].map((_, i) => (
+      {[...Array(15)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute h-1 w-1 rounded-full bg-white/20"
@@ -282,14 +282,14 @@ function FloatingParticles() {
             top: `${Math.random() * 100}%`,
           }}
           animate={{
-            y: [0, -30, 0],
-            opacity: [0.2, 0.8, 0.2],
-            scale: [1, 1.5, 1],
+            y: [0, -20, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.3, 1],
           }}
           transition={{
-            duration: 3 + Math.random() * 2,
+            duration: 2.5 + Math.random() * 1.5,
             repeat: Infinity,
-            delay: Math.random() * 2,
+            delay: Math.random() * 1.5,
             ease: "easeInOut",
           }}
         />
