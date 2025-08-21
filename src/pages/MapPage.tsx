@@ -91,9 +91,9 @@ export default function MapPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="mx-auto max-w-7xl px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left panel unchanged */}
-          <aside className="space-y-6">
+        <div className="grid gap-8 lg:grid-cols-[320px,1fr]">{/* increased gap and explicit column sizing */}
+          {/* Left panel */}
+          <aside className="space-y-6 relative z-10">{/* ensure above map */}
             <div className="bg-slate-800/60 backdrop-blur-sm rounded-2xl border border-white/10 p-6">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 bg-brand-500 rounded-full animate-pulse"></span>
@@ -162,12 +162,9 @@ export default function MapPage() {
           </aside>
 
           {/* Right: real Leaflet map */}
-          <div className="lg:col-span-2 overflow-hidden rounded-2xl border border-white/10">
+          <div className={`relative lg:col-span-1 overflow-hidden rounded-2xl border border-white/10 ${showModal ? 'pointer-events-none' : ''}`}> {/* disable interactions when modal open */}
             <MapContainer center={defaultCenter} zoom={18} style={{ height: 600, width: '100%' }} scrollWheelZoom>
-              <TileLayer
-                attribution='&copy; OpenStreetMap contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {Object.entries(LATLNG).map(([id, [lat, lng]]) => (
                 <Marker key={id} position={[lat, lng]} icon={markerIcon} eventHandlers={{ click: () => {
                   const loc = locations.find((l) => l.id === id)
@@ -189,16 +186,21 @@ export default function MapPage() {
           </div>
         </div>
 
-        {/* Modal with Street/Map toggle remains */}
+        {/* Modal with Street/Map toggle */}
         <AnimatePresence>
           {showModal && selectedLocation && (
-            <motion.div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[1000] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <motion.div className="bg-slate-800 rounded-2xl border border-white/20 max-w-5xl w-full max-h-[90vh] overflow-hidden" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }}>
                 <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-6 border-b border-white/10">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h2 className="text-2xl font-bold text-white">{selectedLocation.name}</h2>
-                      <p className="text-slate-300 mt-1">{selectedLocation.description}</p>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setShowModal(false)} className="rounded-md border border-white/15 bg-slate-700/60 px-3 py-1.5 text-sm text-white hover:bg-slate-600 transition">
+                        ← Back
+                      </button>
+                      <div>
+                        <h2 className="text-2xl font-bold text-white">{selectedLocation.name}</h2>
+                        <p className="text-slate-300 mt-1">{selectedLocation.description}</p>
+                      </div>
                     </div>
                     <button onClick={() => setShowModal(false)} className="w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-lg border border-white/20 text-white transition-all flex items-center justify-center hover:scale-110">✕</button>
                   </div>
