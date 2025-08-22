@@ -69,8 +69,17 @@ export default function AssistantPage() {
   const [typing, setTyping] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
 
-  const getResponse = (userInput: string): string => {
+  const getResponse = (userInput: string): { text: string; showSuggestions: boolean } => {
     const inputLower = userInput.toLowerCase().trim()
+
+    // Handle greetings and open suggestions dropdown
+    const isGreeting = /(\bhi\b|\bhello\b|\bhey\b|\bgood\s*(morning|afternoon|evening)\b|\bnamaste\b|\bhola\b)/i.test(inputLower)
+    if (isGreeting) {
+      return {
+        text: "Hello! What can I help you with? Here are some common questions:",
+        showSuggestions: true,
+      }
+    }
     
     // Check if input matches any predefined question or keywords
     for (const [key, response] of Object.entries(RESPONSES)) {
@@ -87,30 +96,33 @@ export default function AssistantPage() {
         )
         
         if (hasMatch) {
-          return response
+          return { text: response, showSuggestions: false }
         }
       }
     }
     
     // Check for common variations and misspellings
     if (inputLower.includes('library') || inputLower.includes('libraray') || inputLower.includes('lib')) {
-      return RESPONSES.lib
+      return { text: RESPONSES.lib, showSuggestions: false }
     }
     if (inputLower.includes('cafeteria') || inputLower.includes('canteen') || inputLower.includes('food')) {
-      return RESPONSES.canteen
+      return { text: RESPONSES.canteen, showSuggestions: false }
     }
     if (inputLower.includes('class') || inputLower.includes('lecture') || inputLower.includes('room')) {
-      return RESPONSES.gblock
+      return { text: RESPONSES.gblock, showSuggestions: false }
     }
     if (inputLower.includes('admin') || inputLower.includes('administration')) {
-      return RESPONSES.admin
+      return { text: RESPONSES.admin, showSuggestions: false }
     }
     if (inputLower.includes('hostel') || inputLower.includes('dormitory')) {
-      return RESPONSES.hostel
+      return { text: RESPONSES.hostel, showSuggestions: false }
     }
     
     // If no match found, return the default response
-    return `I'm sorry, I don't have specific information about "${userInput}". I can help you with campus directions, facilities, and general information. Please ask about specific campus locations or choose from the suggested questions below.`
+    return {
+      text: `I'm sorry, I don't have specific information about "${userInput}". I can help you with campus directions, facilities, and general information. Please ask about specific campus locations or choose from the suggested questions below.`,
+      showSuggestions: true,
+    }
   }
 
   const send = () => {
@@ -123,19 +135,17 @@ export default function AssistantPage() {
     setShowSuggestions(false)
     
     setTimeout(() => {
-      const response = getResponse(input.trim())
+      const { text: responseText, showSuggestions: suggest } = getResponse(input.trim())
       const reply: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        text: response,
+        text: responseText,
       }
       setMessages((prev) => [...prev, reply])
       setTyping(false)
       
-      // Show suggestions after response if it was an irrelevant question
-      if (response.includes("I'm sorry, I don't have specific information")) {
-        setShowSuggestions(true)
-      }
+      // Show suggestions if requested by the response logic (greetings or fallback)
+      setShowSuggestions(suggest)
     }, 900)
   }
 
